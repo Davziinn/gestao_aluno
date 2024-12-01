@@ -2,8 +2,8 @@ import pool from '../config/database.js';
 
 export const createAluno = async (aluno) => {
     const [result] = await pool.query(
-    'INSERT INTO alunos (nome, email, dataNasc, turmaId) VALUES (?, ?, ?, ?)',
-    [aluno.nome, aluno.email, aluno.dataNasc, aluno.turmaId]
+    'INSERT INTO alunos (id, nome, email, dataNasc, turmaId) VALUES (?, ?, ?, ?, ?)',
+    [aluno.id, aluno.nome, aluno.email, aluno.dataNasc, aluno.turmaId]
     );
     return result;
 };

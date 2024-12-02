@@ -1,8 +1,16 @@
-import { createAluno, getAlunos, getAlunoById, updateAluno, deleteAluno } from '../models/alunoModel.js';
+import { createAluno, getAlunos, getAlunoById, updateAluno, deleteAluno, getTurmaById } from '../models/alunoModel.js';
 
 export const cadastrarAluno = async (req, res) => {
     try {
         const aluno = req.body;
+
+        // Obter os detalhes da turma associada ao aluno
+        const turma = await getTurmaById(aluno.turmaId);
+
+        // Agora você pode, por exemplo, verificar ou incluir dados da turma no processo de cadastro
+        console.log('Turma associada:', turma);
+
+        // Agora, você continua com o cadastro do aluno
         const result = await createAluno(aluno);
         res.status(201).json({ message: 'Aluno cadastrado com sucesso', id: result.insertId });
     } catch (error) {
@@ -31,20 +39,31 @@ export const buscarAluno = async (req, res) => {
 
 export const atualizarAluno = async (req, res) => {
     try {
-        const result = await updateAluno(req.params.id, req.body);
+        const alunoId = req.params.id;
+        const aluno = req.body;
+
+        // Obter os detalhes da turma associada ao aluno
+        const turma = await getTurmaById(aluno.turmaId);
+
+        // Agora você pode, por exemplo, verificar ou incluir dados da turma no processo de atualização
+        console.log('Turma associada:', turma);
+
+        // Atualize os dados do aluno no banco
+        const result = await updateAluno(alunoId, aluno);
         if (result.affectedRows === 0) return res.status(404).json({ message: 'Aluno não encontrado' });
+        
         res.status(200).json({ message: 'Aluno atualizado com sucesso' });
-    }   catch (error) {
+    } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
 export const excluirAluno = async (req, res) => {
     try {
-    const result = await deleteAluno(req.params.id);
-    if (result.affectedRows === 0) return res.status(404).json({ message: 'Aluno não encontrado' });
-    res.status(200).json({ message: 'Aluno excluído com sucesso' });
+        const result = await deleteAluno(req.params.id);
+        if (result.affectedRows === 0) return res.status(404).json({ message: 'Aluno não encontrado' });
+        res.status(200).json({ message: 'Aluno excluído com sucesso' });
     } catch (error) {
-    res.status(500).json({ error: error.message });
-    } 
+        res.status(500).json({ error: error.message });
+    }
 };

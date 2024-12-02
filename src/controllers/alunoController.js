@@ -15,7 +15,7 @@ export const cadastrarAluno = async (req, res) => {
         }
 
         
-        const turmaUrl = `${process.env.TURMA_URL}/${aluno.turmaId}`;
+        const turmaUrl = `${process.env.TURMA_URL}/turmas/${aluno.turmaId}`;
         let turmaResponse;
         
         try {

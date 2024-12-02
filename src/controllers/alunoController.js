@@ -6,12 +6,10 @@ import {
     deleteAluno 
 } from '../models/alunoModel.js'
 
-// Função para cadastrar um aluno
 export const cadastrarAluno = async (req, res) => {
     try {
         const aluno = req.body;
 
-        // Validar se o ID da turma foi fornecido
         if (!aluno.turmaId) {
             return res.status(400).json({ message: 'ID de turma é obrigatório' });
         }

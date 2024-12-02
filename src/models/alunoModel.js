@@ -1,6 +1,6 @@
-import pool from '../config/database.js' // Importa a configuração do banco de dados
+import pool from '../config/database.js'
 
-// Função para criar aluno no banco
+
 export const createAluno = async (aluno) => {
     const [result] = await pool.query(
         'INSERT INTO alunos (nome, email, dataNasc, turmaId) VALUES (?, ?, ?, ?)', 
@@ -9,7 +9,7 @@ export const createAluno = async (aluno) => {
     return result
 }
 
-// Funções de CRUD para aluno
+
 export const getAlunos = async () => {
     const [rows] = await pool.query('SELECT * FROM alunos')
     return rows

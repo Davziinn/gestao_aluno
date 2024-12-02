@@ -1,3 +1,4 @@
+import fetch from 'node-fetch'
 import { 
     createAluno, 
     getAlunos, 
@@ -9,48 +10,48 @@ import {
 // Função para cadastrar um aluno
 export const cadastrarAluno = async (req, res) => {
     try {
-        const aluno = req.body;
+        const aluno = req.body
 
         // Validar se o ID da turma foi fornecido
         if (!aluno.turmaId) {
-            return res.status(400).json({ message: 'ID de turma é obrigatório' });
+            return res.status(400).json({ message: 'ID de turma é obrigatório' })
         }
 
         // Consultar o microserviço de Turma
-        const turmaUrl = `${process.env.TURMA_URL}/${aluno.turmaId}`;
-        let turmaResponse;
-        
+        const turmaUrl = `${process.env.TURMA_URL}/${aluno.turmaId}`
+        let turmaResponse
         try {
-            turmaResponse = await fetch(turmaUrl);
+            turmaResponse = await fetch(turmaUrl)
         } catch (error) {
-            console.error(`Erro ao tentar se conectar ao microserviço de turmas: ${error.message}`);
-            return res.status(500).json({ error: `Erro ao conectar com o microserviço de turmas: ${error.message}` });
+            console.error(`Erro ao tentar se conectar ao microserviço de turmas: ${error.message}`)
+            return res.status(500).json({ error: `Erro ao conectar com o microserviço de turmas: ${error.message}` })
         }
 
         if (!turmaResponse.ok) {
-            console.error(`Erro ao consultar a turma: ${turmaResponse.statusText}`);
-            return res.status(400).json({ message: `Erro ao consultar a Turma: ${turmaResponse.statusText}` });
+            console.error(`Erro ao consultar a turma: ${turmaResponse.statusText}`)
+            return res.status(400).json({ message: `Erro ao consultar a Turma: ${turmaResponse.statusText}` })
         }
 
-        const turmaData = await turmaResponse.json();
+        const turmaData = await turmaResponse.json()
 
-        if (!Array.isArray(turmaData) || turmaData.length === 0) {
-            console.error('Turma não encontrada');
-            return res.status(404).json({ message: 'Turma não encontrada' });
+        // Validar se a turma existe
+        if (!turmaData || Object.keys(turmaData).length === 0) {
+            console.error('Turma não encontrada')
+            return res.status(404).json({ message: 'Turma não encontrada' })
         }
 
         // Inserir o aluno no banco de dados
-        const result = await createAluno(aluno);
+        const result = await createAluno(aluno)
 
         return res.status(201).json({ 
             message: 'Aluno cadastrado com sucesso', 
             id: result.insertId 
-        });
+        })
     } catch (error) {
-        console.error('Erro no cadastro de aluno:', error.message);
-        return res.status(500).json({ error: `Erro interno no servidor: ${error.message}` });
+        console.error('Erro no cadastro de aluno:', error.message)
+        return res.status(500).json({ error: `Erro interno no servidor: ${error.message}` })
     }
-};
+}
 
 // Função para listar todos os alunos
 export const listarAlunos = async (req, res) => {

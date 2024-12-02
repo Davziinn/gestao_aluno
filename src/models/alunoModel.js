@@ -1,7 +1,5 @@
 import pool from '../config/database.js';
 
-const TURMA_URL = 'http://147.79.83.61:3333/turmas';
-
 export const createAluno = async (aluno) => {
     const [result] = await pool.query(
         'INSERT INTO alunos (id, nome, email, dataNasc, turmaId) VALUES (?, ?, ?, ?, ?)',
@@ -33,19 +31,18 @@ export const deleteAluno = async (id) => {
     return result;
 };
 
-// Função para obter a turma de um aluno usando fetch
 export const getTurmaById = async (turmaId) => {
     try {
-        const response = await fetch(`${TURMA_URL}/${turmaId}`);
+        const response = await fetch(`http://147.79.83.61:3333/turmas/${turmaId}`);
         
         if (!response.ok) {
             throw new Error('Turma não encontrada');
         }
-
+        
         const turma = await response.json();
         return turma;
     } catch (error) {
-        console.error('Erro ao buscar turma:', error);
-        throw error;
+        console.error('Erro ao buscar a turma:', error);
+        throw new Error('Erro ao buscar a turma');
     }
 };

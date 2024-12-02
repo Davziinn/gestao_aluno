@@ -24,7 +24,7 @@ export const createAluno = async (aluno) => {
     const [result] = await pool.query(
       'INSERT INTO alunos (nome, email, dataNasc, turmaId) VALUES (?, ?, ?, ?)',
       [aluno.nome, aluno.email, aluno.dataNasc, idTurma]
-    )
+    )    
     return result
   } catch (error) {
     console.error(`Erro ao criar aluno: ${error.message}`)

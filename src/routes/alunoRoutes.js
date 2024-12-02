@@ -1,7 +1,7 @@
-import { Router } from 'express';
+import express from 'express';
 import { cadastrarAluno, listarAlunos, buscarAluno, atualizarAluno, excluirAluno } from '../controllers/alunoController.js';
 
-const router = Router();
+const router = express.Router();
 
 router.post('/alunos', cadastrarAluno);
 router.get('/alunos', listarAlunos);

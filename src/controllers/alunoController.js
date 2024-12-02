@@ -11,12 +11,16 @@ export const cadastrarAluno = async (req, res) => {
     try {
         const aluno = req.body
         const result = await createAluno(aluno)
-        res.status(201).json(result)
+        res.status(201).json({
+            message: 'Aluno criado com sucesso',
+            alunoId: result.insertId
+        })
     } catch (error) {
         console.error('Erro ao cadastrar aluno:', error)
-        res.status(500).send('Erro ao cadastrar aluno')
+        res.status(500).send({ error: 'Erro ao cadastrar aluno' })
     }
 }
+
 
 // Função para listar todos os alunos
 export const listarAlunos = async (req, res) => {

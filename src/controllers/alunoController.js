@@ -11,29 +11,19 @@ export const cadastrarAluno = async (req, res) => {
     try {
         const aluno = req.body;
 
-        // Validar se os IDs foram fornecidos
-        if (!aluno.turmaId || !aluno.eventoId) {
-            return res.status(400).json({ message: 'ID de turma e evento são obrigatórios' });
+        // Validar se o ID da turma foi fornecido
+        if (!aluno.turmaId) {
+            return res.status(400).json({ message: 'ID de turma é obrigatório' });
         }
 
-        // Consultar o microserviço de Turma (via URL fornecida)
-        const turmaResponse = await fetch(`http://147.79.83.61:3333/turmas/${aluno.turmaId}`);
+        // Consultar o microserviço de Turma
+        const turmaResponse = await fetch(`${process.env.TURMA_URL}/${aluno.turmaId}`);
         if (!turmaResponse.ok) {
             return res.status(400).json({ message: `Erro ao consultar a Turma: ${turmaResponse.statusText}` });
         }
         const turmaData = await turmaResponse.json();
         if (!Array.isArray(turmaData) || turmaData.length === 0) {
             return res.status(404).json({ message: 'Turma não encontrada' });
-        }
-
-        // Consultar o microserviço de Evento
-        const eventoResponse = await fetch(`${process.env.EVENTOS_URL}/${aluno.eventoId}`);
-        if (!eventoResponse.ok) {
-            return res.status(400).json({ message: `Erro ao consultar o Evento: ${eventoResponse.statusText}` });
-        }
-        const eventoData = await eventoResponse.json();
-        if (!Array.isArray(eventoData) || eventoData.length === 0) {
-            return res.status(404).json({ message: 'Evento não encontrado' });
         }
 
         // Inserir o aluno no banco de dados
@@ -47,7 +37,6 @@ export const cadastrarAluno = async (req, res) => {
         return res.status(500).json({ error: 'Erro interno no servidor' });
     }
 };
-
 
 
 // Função para listar todos os alunos

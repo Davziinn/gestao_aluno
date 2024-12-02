@@ -6,6 +6,8 @@ import {
     deleteAluno 
 } from '../models/alunoModel.js'
 
+import axios from 'axios'
+
 export const cadastrarAluno = async (req, res) => {
     try {
         const aluno = req.body;
@@ -14,26 +16,19 @@ export const cadastrarAluno = async (req, res) => {
             return res.status(400).json({ message: 'ID de turma é obrigatório' });
         }
 
-        
         const turmaUrl = `${process.env.TURMA_URL}/turmas/${aluno.turmaId}`;
+
         let turmaResponse;
-        
         try {
-            turmaResponse = await fetch(turmaUrl);
+            turmaResponse = await axios.get(turmaUrl);
         } catch (error) {
             console.error(`Erro ao tentar se conectar ao microserviço de turmas: ${error.message}`);
             return res.status(500).json({ error: `Erro ao conectar com o microserviço de turmas: ${error.message}` });
         }
 
-        if (!turmaResponse.ok) {
-            console.error(`Erro ao consultar a turma: ${turmaResponse.statusText}`);
-            return res.status(400).json({ message: `Erro ao consultar a Turma: ${turmaResponse.statusText}` });
-        }
+        const turmaData = turmaResponse.data;
 
-        const turmaData = await turmaResponse.json();
-
-        if (!Array.isArray(turmaData) || turmaData.length === 0) {
-            console.error('Turma não encontrada');
+        if (!turmaData) {
             return res.status(404).json({ message: 'Turma não encontrada' });
         }
 
@@ -48,6 +43,7 @@ export const cadastrarAluno = async (req, res) => {
         return res.status(500).json({ error: `Erro interno no servidor: ${error.message}` });
     }
 };
+
 
 export const listarAlunos = async (req, res) => {
     try {

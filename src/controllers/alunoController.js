@@ -17,7 +17,16 @@ export const cadastrarAluno = async (req, res) => {
         }
 
         // Consultar o microserviço de Turma
-        const turmaResponse = await fetch(`${process.env.TURMA_URL}/${aluno.turmaId}`);
+        const turmaUrl = `${process.env.TURMA_URL}/${aluno.turmaId}`;
+        let turmaResponse;
+        
+        try {
+            turmaResponse = await fetch(turmaUrl);
+        } catch (error) {
+            console.error(`Erro ao tentar se conectar ao microserviço de turmas: ${error.message}`);
+            return res.status(500).json({ error: `Erro ao conectar com o microserviço de turmas: ${error.message}` });
+        }
+
         if (!turmaResponse.ok) {
             console.error(`Erro ao consultar a turma: ${turmaResponse.statusText}`);
             return res.status(400).json({ message: `Erro ao consultar a Turma: ${turmaResponse.statusText}` });
@@ -42,7 +51,6 @@ export const cadastrarAluno = async (req, res) => {
         return res.status(500).json({ error: `Erro interno no servidor: ${error.message}` });
     }
 };
-
 
 // Função para listar todos os alunos
 export const listarAlunos = async (req, res) => {

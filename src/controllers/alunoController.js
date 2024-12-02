@@ -1,9 +1,15 @@
+<<<<<<< HEAD
 import { createAluno, getAlunos, getAlunoById, updateAluno, deleteAluno, getTurmaById } from '../models/alunoModel.js';
+=======
+import { createAluno, getAlunos, getAlunoById, updateAluno, deleteAluno } from '../models/alunoModel.js';
+import fetch from 'node-fetch';
+>>>>>>> 2fee608f50774eaac0a718b6878e9b713d7b6d47
 
 export const cadastrarAluno = async (req, res) => {
     try {
         const aluno = req.body;
 
+<<<<<<< HEAD
         // Obter os detalhes da turma associada ao aluno
         const turma = await getTurmaById(aluno.turmaId);
 
@@ -11,17 +17,70 @@ export const cadastrarAluno = async (req, res) => {
         console.log('Turma associada:', turma);
 
         // Agora, você continua com o cadastro do aluno
+=======
+        // Validar se os IDs foram fornecidos
+        if (!aluno.turmaId || !aluno.eventoId) {
+            return res.status(400).json({ message: 'ID de turma e evento são obrigatórios' });
+        }
+
+        // Consultar o microserviço de Turma
+        const turmaResponse = await fetch(`${process.env.TURMA_URL}/${aluno.turmaId}`);
+        if (!turmaResponse.ok) {
+            return res.status(400).json({ message: `Erro ao consultar a Turma: ${turmaResponse.statusText}` });
+        }
+        const turmaData = await turmaResponse.json();
+        if (!Array.isArray(turmaData) || turmaData.length === 0) {
+            return res.status(404).json({ message: 'Turma não encontrada' });
+        }
+
+        // Consultar o microserviço de Evento
+        const eventoResponse = await fetch(`${process.env.EVENTOS_URL}/${aluno.eventoId}`);
+        if (!eventoResponse.ok) {
+            return res.status(400).json({ message: `Erro ao consultar o Evento: ${eventoResponse.statusText}` });
+        }
+        const eventoData = await eventoResponse.json();
+        if (!Array.isArray(eventoData) || eventoData.length === 0) {
+            return res.status(404).json({ message: 'Evento não encontrado' });
+        }
+
+        // Inserir o aluno no banco de dados
+>>>>>>> 2fee608f50774eaac0a718b6878e9b713d7b6d47
         const result = await createAluno(aluno);
-        res.status(201).json({ message: 'Aluno cadastrado com sucesso', id: result.insertId });
+        return res.status(201).json({ 
+            message: 'Aluno cadastrado com sucesso', 
+            id: result.insertId 
+        });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Erro no cadastro de aluno:', error.message);
+        return res.status(500).json({ error: 'Erro interno no servidor' });
     }
 };
 
 export const listarAlunos = async (req, res) => {
     try {
         const alunos = await getAlunos();
-        res.status(200).json(alunos);
+
+        // Para cada aluno, buscar os dados da turma e evento
+        const alunosComDetalhes = await Promise.all(
+            alunos.map(async (aluno) => {
+                // Consultar dados da turma
+                const turmaResponse = await fetch(`${process.env.TURMA_URL}/${aluno.turmaId}`);
+                const turmaData = await turmaResponse.json();
+
+                // Consultar dados do evento
+                const eventoResponse = await fetch(`${process.env.EVENTOS_URL}/${aluno.eventoId}`);
+                const eventoData = await eventoResponse.json();
+
+                // Retornar os dados do aluno com os detalhes da turma e evento
+                return {
+                    ...aluno,
+                    turma: turmaData,    // Adiciona os dados da turma
+                    evento: eventoData   // Adiciona os dados do evento
+                };
+            })
+        );
+
+        res.status(200).json(alunosComDetalhes);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -67,3 +126,7 @@ export const excluirAluno = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2fee608f50774eaac0a718b6878e9b713d7b6d47

@@ -9,17 +9,45 @@ import {
 // Função para cadastrar um aluno
 export const cadastrarAluno = async (req, res) => {
     try {
-        const aluno = req.body
-        const result = await createAluno(aluno)
-        res.status(201).json({
-            message: 'Aluno criado com sucesso',
-            alunoId: result.insertId
-        })
+        const aluno = req.body;
+
+        // Validar se os IDs foram fornecidos
+        if (!aluno.turmaId || !aluno.eventoId) {
+            return res.status(400).json({ message: 'ID de turma e evento são obrigatórios' });
+        }
+
+        // Consultar o microserviço de Turma (via URL fornecida)
+        const turmaResponse = await fetch(`http://147.79.83.61:3333/turmas/${aluno.turmaId}`);
+        if (!turmaResponse.ok) {
+            return res.status(400).json({ message: `Erro ao consultar a Turma: ${turmaResponse.statusText}` });
+        }
+        const turmaData = await turmaResponse.json();
+        if (!Array.isArray(turmaData) || turmaData.length === 0) {
+            return res.status(404).json({ message: 'Turma não encontrada' });
+        }
+
+        // Consultar o microserviço de Evento
+        const eventoResponse = await fetch(`${process.env.EVENTOS_URL}/${aluno.eventoId}`);
+        if (!eventoResponse.ok) {
+            return res.status(400).json({ message: `Erro ao consultar o Evento: ${eventoResponse.statusText}` });
+        }
+        const eventoData = await eventoResponse.json();
+        if (!Array.isArray(eventoData) || eventoData.length === 0) {
+            return res.status(404).json({ message: 'Evento não encontrado' });
+        }
+
+        // Inserir o aluno no banco de dados
+        const result = await createAluno(aluno);
+        return res.status(201).json({ 
+            message: 'Aluno cadastrado com sucesso', 
+            id: result.insertId 
+        });
     } catch (error) {
-        console.error('Erro ao cadastrar aluno:', error)
-        res.status(500).send({ error: 'Erro ao cadastrar aluno' })
+        console.error('Erro no cadastro de aluno:', error.message);
+        return res.status(500).json({ error: 'Erro interno no servidor' });
     }
-}
+};
+
 
 
 // Função para listar todos os alunos

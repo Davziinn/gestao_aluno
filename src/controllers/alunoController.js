@@ -19,22 +19,27 @@ export const cadastrarAluno = async (req, res) => {
         // Consultar o microserviço de Turma
         const turmaResponse = await fetch(`${process.env.TURMA_URL}/${aluno.turmaId}`);
         if (!turmaResponse.ok) {
+            console.error(`Erro ao consultar a turma: ${turmaResponse.statusText}`);
             return res.status(400).json({ message: `Erro ao consultar a Turma: ${turmaResponse.statusText}` });
         }
+
         const turmaData = await turmaResponse.json();
+
         if (!Array.isArray(turmaData) || turmaData.length === 0) {
+            console.error('Turma não encontrada');
             return res.status(404).json({ message: 'Turma não encontrada' });
         }
 
         // Inserir o aluno no banco de dados
         const result = await createAluno(aluno);
+
         return res.status(201).json({ 
             message: 'Aluno cadastrado com sucesso', 
             id: result.insertId 
         });
     } catch (error) {
         console.error('Erro no cadastro de aluno:', error.message);
-        return res.status(500).json({ error: 'Erro interno no servidor' });
+        return res.status(500).json({ error: `Erro interno no servidor: ${error.message}` });
     }
 };
 
